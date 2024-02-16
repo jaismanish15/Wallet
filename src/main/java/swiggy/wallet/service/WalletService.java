@@ -6,9 +6,9 @@ import swiggy.wallet.valueObject.Money;
 import java.util.List;
 
 public interface WalletService {
-    Wallet createWallet();
+    Wallet create();
 
-    Money getWalletBalance(Long walletId);
+    Money getBalance(Long walletId);
 
     Money deposit(Long walletId, Money depositMoney);
 

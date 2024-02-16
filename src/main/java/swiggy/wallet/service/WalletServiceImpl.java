@@ -16,13 +16,13 @@ public class WalletServiceImpl implements WalletService {
 
 
     @Override
-    public Wallet createWallet() {
+    public Wallet create() {
         Wallet wallet = new Wallet(new Money());
         walletRepository.save(wallet);
         return wallet;
     }
     @Override
-    public Money getWalletBalance(Long walletId) {
+    public Money getBalance(Long walletId) {
         return walletRepository.findById(walletId)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"))
                 .getMoney();

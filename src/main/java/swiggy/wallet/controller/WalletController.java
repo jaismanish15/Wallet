@@ -22,7 +22,7 @@ public class WalletController {
     @PostMapping("/create")
     public ResponseEntity<Wallet> createWallet() {
         try {
-            Wallet wallet = walletService.createWallet();
+            Wallet wallet = walletService.create();
             return ResponseEntity.ok(wallet);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -32,7 +32,7 @@ public class WalletController {
     @GetMapping("/{walletId}")
     public ResponseEntity<Money> getWallet(@PathVariable Long walletId) {
         try {
-            Money balance = walletService.getWalletBalance(walletId);
+            Money balance = walletService.getBalance(walletId);
             return ResponseEntity.ok(balance);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

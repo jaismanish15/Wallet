@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import swiggy.wallet.valueObject.Money;
 import swiggy.wallet.entity.Wallet;
 import swiggy.wallet.enums.Currency;
@@ -38,7 +37,7 @@ class WalletServiceImplTest {
         long id = mockWallet.getId();
         when(walletRepository.findById(id)).thenReturn(Optional.of(mockWallet));
 
-        Money result = walletService.getWalletBalance(id);
+        Money result = walletService.getBalance(id);
 
         assertEquals(new Money(BigDecimal.valueOf(100), Currency.USD), result);
         verify(walletRepository, times(1)).findById(id);

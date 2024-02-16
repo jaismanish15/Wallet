@@ -22,8 +22,6 @@ import swiggy.wallet.valueObject.Money;
 import java.math.BigDecimal;
 import java.util.Collections;
 
-import static org.apache.el.lang.ELArithmetic.isNumber;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -47,7 +45,7 @@ class WalletControllerTest {
     @WithMockUser(username = "mj", roles = "USER")
     public void testCreateWallet_AuthenticatedUser_ShouldReturnNewWallet() throws Exception {
         Wallet mockWallet = new Wallet(new Money(BigDecimal.ZERO, Currency.USD));
-        when(walletService.createWallet()).thenReturn(mockWallet);
+        when(walletService.create()).thenReturn(mockWallet);
 
         mockMvc.perform(post("/wallet/create")
                         .with(csrf())
@@ -56,14 +54,14 @@ class WalletControllerTest {
                 .andExpect(jsonPath("$.id").value(0))
                 .andExpect(jsonPath("$.money.amount").value(0.0));
 
-        verify(walletService, times(1)).createWallet();
+        verify(walletService, times(1)).create();
     }
 
     @Test
     @WithMockUser(username = "mj", roles = "USER")
     public void testCreateWallet_ShouldReturnNewWallet() throws Exception {
         Wallet mockWallet = new Wallet(new Money(BigDecimal.ZERO, Currency.USD));
-        when(walletService.createWallet()).thenReturn(mockWallet);
+        when(walletService.create()).thenReturn(mockWallet);
 
         mockMvc.perform(post("/wallet/create")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -72,14 +70,14 @@ class WalletControllerTest {
                 .andExpect(jsonPath("$.money.amount").value(0.0))
                 .andExpect(jsonPath("$.money.currency").value("USD"));
 
-        verify(walletService, times(1)).createWallet();
+        verify(walletService, times(1)).create();
     }
 
     @Test
     @WithMockUser(username = "mj", roles = "USER")
     public void testGetWallet_ShouldReturnWalletBalance() throws Exception {
         Money mockBalance = new Money(new BigDecimal("100.00"), Currency.USD);
-        when(walletService.getWalletBalance(1L)).thenReturn(mockBalance);
+        when(walletService.getBalance(1L)).thenReturn(mockBalance);
 
         mockMvc.perform(get("/wallet/1")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -87,7 +85,7 @@ class WalletControllerTest {
                 .andExpect(jsonPath("$.amount").value(100.0))
                 .andExpect(jsonPath("$.currency").value("USD"));
 
-        verify(walletService, times(1)).getWalletBalance(1L);
+        verify(walletService, times(1)).getBalance(1L);
     }
 
     @Test
