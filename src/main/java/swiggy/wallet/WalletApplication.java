@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 
 
 @SpringBootApplication
-@EnableWebSecurity
 public class WalletApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WalletApplication.class, args);

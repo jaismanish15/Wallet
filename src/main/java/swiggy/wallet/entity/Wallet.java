@@ -1,7 +1,9 @@
 package swiggy.wallet.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import swiggy.wallet.valueObject.Money;
 
 import java.math.BigDecimal;
@@ -9,6 +11,7 @@ import java.util.Objects;
 
 @Entity
 @Data
+@AllArgsConstructor
 @Table(name = "wallets")
 public class Wallet {
     @Id
@@ -17,10 +20,11 @@ public class Wallet {
 
     private Money money;
 
-
-    public Wallet(Money money) {
-        this.money = money;
+    public Wallet(){
+        this.money = new Money();
     }
+
+
 
     public Money deposit(Money depositMoney) {
         if (Objects.isNull(depositMoney) || depositMoney.getAmount().compareTo(BigDecimal.ZERO) <= 0) {

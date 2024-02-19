@@ -1,20 +1,18 @@
 package swiggy.wallet.service;
 
 import swiggy.wallet.entity.Wallet;
+import swiggy.wallet.exception.AuthenticationFailed;
 import swiggy.wallet.valueObject.Money;
 
 import java.util.List;
 
 public interface WalletService {
-    Wallet create();
 
-    Money getBalance(Long walletId);
+    Money deposit(String username, Money depositMoney) throws AuthenticationFailed;
 
-    Money deposit(Long walletId, Money depositMoney);
+    Money withdraw(String username, Money withdrawalMoney) throws AuthenticationFailed;
 
-    Money withdraw(Long walletId, Money withdrawalMoney);
 
-    List<Wallet> fetchAll();
 
 
 }
