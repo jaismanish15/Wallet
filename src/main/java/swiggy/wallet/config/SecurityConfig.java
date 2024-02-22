@@ -24,7 +24,7 @@ public class SecurityConfig {
 
         http.csrf().disable()
                 .authorizeHttpRequests((authorize) -> {
-                    authorize.requestMatchers(HttpMethod.POST,"/api/user/register").permitAll().
+                    authorize.requestMatchers(HttpMethod.POST,"/api/users/register").permitAll().
                             anyRequest().authenticated();
                 }).
                 headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)).httpBasic(Customizer.withDefaults());

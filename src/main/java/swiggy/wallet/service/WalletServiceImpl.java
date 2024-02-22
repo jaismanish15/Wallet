@@ -5,6 +5,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import swiggy.wallet.entity.User;
 import swiggy.wallet.exception.AuthenticationFailed;
+import swiggy.wallet.exception.InsufficientBalanceException;
+import swiggy.wallet.exception.WalletNotFoundException;
 import swiggy.wallet.repository.UserRepository;
 import swiggy.wallet.valueObject.Money;
 import swiggy.wallet.entity.Wallet;

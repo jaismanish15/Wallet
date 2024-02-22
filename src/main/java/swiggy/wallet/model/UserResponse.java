@@ -4,18 +4,19 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import swiggy.wallet.entity.Wallet;
+import swiggy.wallet.valueObject.Money;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonRootName("transactionResponse")
-public class TransactionResponse {
+@JsonRootName("userResponse")
+public class UserResponse {
+    private Long id;
+    private String username;
+    private Wallet wallet;
     private String message;
-    private LocalDateTime timeStamp = LocalDateTime.now();
-
-    public TransactionResponse(String message) {
+    public UserResponse(String message){
         this.message = message;
     }
 }

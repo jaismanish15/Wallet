@@ -23,6 +23,9 @@ public class Wallet {
     public Wallet(){
         this.money = new Money();
     }
+    public Wallet(Money money){
+        this.money = new Money();
+    }
 
 
 

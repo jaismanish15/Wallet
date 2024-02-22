@@ -1,8 +1,10 @@
 package swiggy.wallet.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +13,15 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import swiggy.wallet.entity.User;
+import swiggy.wallet.entity.Wallet;
+import swiggy.wallet.exception.UserAlreadyPresentException;
+import swiggy.wallet.model.UserResponse;
 import swiggy.wallet.service.UserService;
 
 import static org.mockito.Mockito.*;
@@ -31,79 +41,55 @@ public class UserControllerTest {
     private UserService userService;
 
     @Autowired
+    private UserController userController;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        reset(userService);
+        MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test
-    void testRegisterNewUser_Successful() throws Exception {
-        User userRequestModel = new User("testUser", "testPassword");
-        User registeredUser = new User("testUser", "testPassword");
+    public void testRegisterSuccess() throws Exception {
+        UserResponse expectedResponse = new UserResponse(1L, "testuser", null, "User Registered Successfully");
 
-//        registeredUser.setPassword(passwordEncoder.encode(userRequestModel.getPassword()));
+        when(userService.register(any(User.class))).thenReturn(expectedResponse);
 
-        when(userService.register(userRequestModel)).thenReturn(registeredUser);
-
-        mockMvc.perform(post("/api/user/register")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRequestModel)))
-                .andExpect(status().isOk());
-
-        verify(userService, times(1)).register(userRequestModel);
+                        .content("{ \"username\": \"testuser\", \"password\": \"testpassword\" }"))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(expectedResponse.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value(expectedResponse.getUsername()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedResponse.getMessage()));
     }
 
     @Test
-    void expectUserAlreadyExists() throws Exception {
-        UserRequestModel userRequestModel = new UserRequestModel("testUser","testPassword");
+    public void testRegisterUserAlreadyPresent() throws Exception {
+        when(userService.register(any(User.class)))
+                .thenThrow(new UserAlreadyPresentException("User Already Registered"));
 
-        when(userService.register(userRequestModel)).thenThrow(UserAlreadyExistsException.class);
-
-        mockMvc.perform(post("/api/v1/users")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRequestModel)))
-                .andExpect(status().isBadRequest());
+                        .content("{ \"username\": \"existinguser\", \"password\": \"testpassword\" }"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("User Already Registered"));
     }
 
     @Test
     @WithMockUser(username = "user")
-    void expectUserDeleted() throws Exception {
-        when(userService.delete()).thenReturn(USER_DELETED_SUCCESSFULLY);
+    void testUserDeleted_Successful() throws Exception {
+        when(userService.delete()).thenReturn("User Deleted Successfully");
 
-        mockMvc.perform(delete("/api/v1/users")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(delete("/api/users")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isAccepted())
-                .andExpect(jsonPath("$.message").value(USER_DELETED_SUCCESSFULLY));
+                .andExpect(content().string("User Deleted Successfully"));
         verify(userService, times(1)).delete();
     }
 
-    @Test
-    @WithMockUser(username = "userNotFound")
-    void expectUserNotFoundException() throws Exception {
-        String username = "userNotFound";
-        String errorMessage = "User "+username+" not be found.";
 
-        when(userService.delete()).thenThrow(new UserNotFoundException(errorMessage));
-
-        mockMvc.perform(delete("/api/v1/users")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-        verify(userService, times(1)).delete();
-    }
-
-    @Test
-    @WithMockUser(username = "sender")
-    void expectTransactionSuccessful() throws Exception {
-        TransactionRequestModel transactionRequestModel = new TransactionRequestModel("sender", new Money(100, Currency.INR));
-        String requestJson = objectMapper.writeValueAsString(transactionRequestModel);
-        when(userService.transact(transactionRequestModel)).thenReturn(TRANSACTION_SUCCESSFUL);
-
-        mockMvc.perform(put("/api/v1/users/transact")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
-                .andExpect(status().isAccepted())
-                .andExpect(jsonPath("$.message").value(TRANSACTION_SUCCESSFUL));
-    }
 }

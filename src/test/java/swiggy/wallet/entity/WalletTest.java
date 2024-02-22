@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
+import swiggy.wallet.entity.Wallet;
 import swiggy.wallet.enums.Currency;
-import swiggy.wallet.repository.WalletRepository;
-import swiggy.wallet.service.WalletService;
+import swiggy.wallet.exception.InsufficientBalanceException;
+import swiggy.wallet.exception.InvalidAmountException;
 import swiggy.wallet.valueObject.Money;
 
 import java.math.BigDecimal;
@@ -19,47 +19,56 @@ import static org.mockito.Mockito.when;
 
 public class WalletTest {
 
+    @Mock
+    private Money mockMoney;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
     public void testWalletInitialization() {
-        Money initialBalance = new Money(BigDecimal.valueOf(100), Currency.USD);
-        Wallet wallet1 = new Wallet(initialBalance);
+        Wallet wallet = new Wallet();
 
-        assertEquals(0, wallet1.getId());
-        assertEquals(initialBalance, wallet1.getMoney());
+        assertEquals(0, wallet.getId());
+        assertEquals(0.00, wallet.getMoney().getAmount().doubleValue());
     }
 
     @Test
     void testDeposit_ValidDeposit_ShouldIncreaseBalance() {
-        Wallet wallet = new Wallet(new Money(new BigDecimal("10.00"), Currency.USD));
+        Wallet wallet = new Wallet();
         Money depositMoney = new Money(new BigDecimal("5.00"), Currency.USD);
+        Money newBalance1 = wallet.deposit(depositMoney);
+        assertEquals(new BigDecimal("5.00"), newBalance1.getAmount());
+        Money newBalance2 = wallet.deposit(depositMoney);
+        assertEquals(new BigDecimal("10.00"), newBalance2.getAmount());
 
-        Money newBalance = wallet.deposit(depositMoney);
-
-        assertEquals(new BigDecimal("15.00"), newBalance.getAmount());
     }
 
     @Test
     void testDeposit_InvalidDepositAmount_ShouldThrowException() {
-        Wallet wallet = new Wallet(new Money(new BigDecimal("10.00"), Currency.USD));
+        Wallet wallet = new Wallet();
         Money invalidDeposit = new Money(new BigDecimal("-10"), Currency.USD);
 
         assertThrows(IllegalArgumentException.class, () -> wallet.deposit(invalidDeposit));
     }
 
     @Test
-    void testWithdraw_ValidWithdrawal_ShouldDecreaseBalance() {
-        Wallet wallet = new Wallet(new Money(new BigDecimal("20.00"), Currency.USD));
+    void testWithdraw_ValidWithdrawal_ShouldDecreaseBalance() throws InsufficientBalanceException {
+        Wallet wallet = new Wallet();
+        Money depositMoney = new Money(new BigDecimal("15.00"), Currency.USD);
+        wallet.deposit(depositMoney);
         Money withdrawalMoney = new Money(new BigDecimal("7.50"), Currency.USD);
 
         Money newBalance = wallet.withdraw(withdrawalMoney);
 
-        assertEquals(new BigDecimal("12.50"), newBalance.getAmount());
+        assertEquals(new BigDecimal("7.50"), newBalance.getAmount());
     }
 
     @Test
     void testWithdraw_InvalidWithdrawalAmount_ShouldThrowException() {
-        Wallet wallet = new Wallet(new Money(new BigDecimal("20.00"), Currency.USD));
+        Wallet wallet = new Wallet();
         Money invalidWithdrawal = new Money(new BigDecimal("-5.00"), Currency.USD);
 
         assertThrows(IllegalArgumentException.class, () -> wallet.withdraw(invalidWithdrawal));
@@ -67,10 +76,9 @@ public class WalletTest {
 
     @Test
     void testWithdraw_InsufficientFunds_ShouldThrowException() {
-        Wallet wallet = new Wallet(new Money(new BigDecimal("20.00"), Currency.USD));
+        Wallet wallet = new Wallet();
         Money withdrawalMoney = new Money(new BigDecimal("25.00"), Currency.USD);
 
         assertThrows(IllegalStateException.class, () -> wallet.withdraw(withdrawalMoney));
     }
-
 }

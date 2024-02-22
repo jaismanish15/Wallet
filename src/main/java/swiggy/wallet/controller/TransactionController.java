@@ -12,14 +12,20 @@ import swiggy.wallet.model.TransactionResponse;
 import swiggy.wallet.service.TransactionService;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/transactions")
 public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
     @PostMapping("/transact")
-    public ResponseEntity<TransactionResponse> transact(@RequestBody TransactionRequest request) throws InsufficientBalanceException, InvalidAmountException, UserNotFoundException {
-        String response = transactionService.transact(request);
-        return new ResponseEntity<>(new TransactionResponse(response), HttpStatus.ACCEPTED);
+    public ResponseEntity<TransactionResponse> transact(@RequestBody TransactionRequest request) {
+        try {
+            String response = transactionService.transact(request);
+            return new ResponseEntity<>(new TransactionResponse(response), HttpStatus.OK);
+        } catch (InsufficientBalanceException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new TransactionResponse(e.getMessage()));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new TransactionResponse("User not found"));
+        }
     }
 }

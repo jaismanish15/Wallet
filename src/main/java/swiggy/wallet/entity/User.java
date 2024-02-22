@@ -1,14 +1,13 @@
 package swiggy.wallet.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import swiggy.wallet.enums.Currency;
 import swiggy.wallet.valueObject.Money;
 
-import java.math.BigDecimal;
 
 
 @Table(name = "users")
@@ -25,6 +24,8 @@ public class User {
     @Column(unique = true)
     private String username;
 
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column
     private String password;
 
@@ -38,6 +39,7 @@ public class User {
     public User(String username, String password){
         this.username = username;
         this.password = password;
+        this.wallet = new Wallet(new Money());
     }
 
 }

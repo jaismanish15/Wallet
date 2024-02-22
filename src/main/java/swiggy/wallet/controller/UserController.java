@@ -8,12 +8,15 @@ import org.springframework.web.bind.annotation.*;
 import swiggy.wallet.entity.User;
 import swiggy.wallet.exception.InsufficientBalanceException;
 import swiggy.wallet.exception.InvalidAmountException;
+import swiggy.wallet.exception.UserAlreadyPresentException;
+import swiggy.wallet.exception.UserNotFoundException;
 import swiggy.wallet.model.TransactionRequest;
 import swiggy.wallet.model.TransactionResponse;
+import swiggy.wallet.model.UserResponse;
 import swiggy.wallet.service.UserService;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
@@ -23,25 +26,20 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
+    public ResponseEntity<UserResponse> register(@RequestBody User user) {
         try {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            User registeredUser = userService.register(user);
-            return ResponseEntity.ok(registeredUser);
-        } catch (Exception e) {
-            User errorUser = new User();
-            errorUser.setUsername("Error");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(errorUser);
+            UserResponse userResponse = userService.register(user);
+            return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
+        } catch (UserAlreadyPresentException e) {
+            return new ResponseEntity<>(new UserResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
-    @DeleteMapping
+    @DeleteMapping("")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<String> deleteUser() throws Exception {
-        this.userService.delete();
-        return ResponseEntity.ok("User Deleted successfully");
+    public ResponseEntity<String> delete() throws UserNotFoundException {
+        String message  = userService.delete();
+        return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
     }
-
 
 }
