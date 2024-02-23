@@ -20,6 +20,10 @@ public class Money {
         this.amount = amount;
         this.currency = currency;
     }
+    public Money(Currency currency) {
+        this.amount = new BigDecimal("0.0");
+        this.currency = currency;
+    }
     public Money(){
         this.amount = new BigDecimal("0.0");
         this.currency = Currency.USD;

@@ -6,8 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import swiggy.wallet.enums.Country;
 import swiggy.wallet.valueObject.Money;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 
 @Table(name = "users")
@@ -29,6 +32,10 @@ public class User {
     @Column
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private Country country;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "wallet_id")
@@ -36,10 +43,11 @@ public class User {
     private Wallet wallet = new Wallet();
 
 
-    public User(String username, String password){
+    public User(String username, String password, Country country){
         this.username = username;
         this.password = password;
-        this.wallet = new Wallet(new Money());
+        this.country = country;
+        this.wallet = new Wallet(country);
     }
 
 }

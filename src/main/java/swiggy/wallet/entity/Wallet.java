@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import swiggy.wallet.enums.Country;
 import swiggy.wallet.exception.InsufficientBalanceException;
 import swiggy.wallet.valueObject.Money;
 
@@ -24,8 +25,8 @@ public class Wallet {
     public Wallet(){
         this.money = new Money();
     }
-    public Wallet(Money money){
-        this.money = new Money();
+    public Wallet(Country country){
+        this.money = new Money(country.getCurrency());
     }
 
 

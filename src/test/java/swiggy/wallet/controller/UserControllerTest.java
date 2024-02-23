@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import swiggy.wallet.entity.User;
 import swiggy.wallet.entity.Wallet;
+import swiggy.wallet.enums.Country;
 import swiggy.wallet.exception.UserAlreadyPresentException;
 import swiggy.wallet.model.UserResponse;
 import swiggy.wallet.service.UserService;
@@ -54,13 +55,13 @@ public class UserControllerTest {
 
     @Test
     public void testRegisterSuccess() throws Exception {
-        UserResponse expectedResponse = new UserResponse(1L, "testuser", null, "User Registered Successfully");
-
+        UserResponse expectedResponse = new UserResponse(1L, "testuser", null, Country.USA, "User Registered Successfully");
+        User userToRegister = new User("testuser", "password", Country.USA);
         when(userService.register(any(User.class))).thenReturn(expectedResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{ \"username\": \"testuser\", \"password\": \"testpassword\" }"))
+                        .content(objectMapper.writeValueAsString(userToRegister)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(expectedResponse.getId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.username").value(expectedResponse.getUsername()))
@@ -69,12 +70,13 @@ public class UserControllerTest {
 
     @Test
     public void testRegisterUserAlreadyPresent() throws Exception {
+        User userToRegister = new User("testuser", "password", Country.USA);
         when(userService.register(any(User.class)))
                 .thenThrow(new UserAlreadyPresentException("User Already Registered"));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{ \"username\": \"existinguser\", \"password\": \"testpassword\" }"))
+                        .content(objectMapper.writeValueAsString(userToRegister)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("User Already Registered"));
     }

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import swiggy.wallet.entity.Wallet;
+import swiggy.wallet.enums.Country;
 import swiggy.wallet.valueObject.Money;
 
 @Data
@@ -15,6 +16,7 @@ public class UserResponse {
     private Long id;
     private String username;
     private Wallet wallet;
+    private Country country;
     private String message;
     public UserResponse(String message){
         this.message = message;
