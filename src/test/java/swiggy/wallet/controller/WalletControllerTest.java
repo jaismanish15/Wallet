@@ -43,9 +43,19 @@ class WalletControllerTest {
 
     @Test
     public void testDepositUnauthorized() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/wallet/deposit")
+        mockMvc.perform(MockMvcRequestBuilders.post("/wallet/1/deposit")
                         .contentType("application/json")
-                        .content("{\"amount\": 10, \"currency\": \"USD\"}")
+                        .content("{\"amount\": 5, \"currency\": \"USD\"}")
+                        .with(csrf())
+                )
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
+
+    @Test
+    public void testWithdrawUnauthorized() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/wallet/1/withdraw")
+                        .contentType("application/json")
+                        .content("{\"amount\": 5, \"currency\": \"USD\"}")
                         .with(csrf())
                 )
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
@@ -54,8 +64,8 @@ class WalletControllerTest {
     @Test
     @WithMockUser(username = "mj")
     public void testDepositAuthorized() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/wallet/deposit")
-                        .contentType("application/json")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/wallet/1/deposit")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"amount\": 10, \"currency\": \"USD\"}")
                         .with(csrf()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -66,28 +76,27 @@ class WalletControllerTest {
     public void testDeposit_Successful() throws Exception {
         Money depositMoney = new Money(new BigDecimal("50.00"), Currency.USD);
         Money updatedBalance = new Money(new BigDecimal("50.00"), Currency.USD);
-        when(walletService.deposit("mj", depositMoney)).thenReturn(updatedBalance);
+        when(walletService.deposit(1L, depositMoney)).thenReturn(updatedBalance);
 
-        mockMvc.perform(post("/wallet/deposit")
+        mockMvc.perform(post("/api/wallet/1/deposit")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(depositMoney)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount").value(50.0))
                 .andExpect(jsonPath("$.currency").value("USD"));
-
-        verify(walletService, times(1)).deposit("mj", depositMoney);
+        verify(walletService, times(1)).deposit(1L, depositMoney);
     }
 
     @Test
     @WithMockUser(username = "mj")
     public void testWithdraw_ShouldReturnUpdatedBalance() throws Exception {
-        walletService.deposit("mj", new Money(new BigDecimal("50.00"), Currency.USD));
+        walletService.deposit(1L, new Money(new BigDecimal("50.00"), Currency.USD));
         Money withdrawalMoney = new Money(new BigDecimal("20.00"), Currency.USD);
         Money updatedBalance = new Money(new BigDecimal("30.00"), Currency.USD);
-        when(walletService.withdraw("mj",withdrawalMoney)).thenReturn(updatedBalance);
+        when(walletService.withdraw(1L,withdrawalMoney)).thenReturn(updatedBalance);
 
-        mockMvc.perform(post("/wallet/withdraw")
+        mockMvc.perform(post("/api/wallet/1/withdraw")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(withdrawalMoney)))
@@ -95,29 +104,17 @@ class WalletControllerTest {
                 .andExpect(jsonPath("$.amount").value(30.0))
                 .andExpect(jsonPath("$.currency").value("USD"));
 
-        verify(walletService, times(1)).withdraw("mj", withdrawalMoney);
+        verify(walletService, times(1)).withdraw(1L, withdrawalMoney);
     }
-
-
 
     @Test
     @WithMockUser(username = "mj")
     public void testWithdrawAuthorized() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/wallet/withdraw")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/wallet/1/withdraw")
                         .contentType("application/json")
                         .content("{\"amount\": 5, \"currency\": \"USD\"}")
                         .with(csrf()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
-    }
-
-    @Test
-    public void testWithdrawUnauthorized() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/wallet/withdraw")
-                        .contentType("application/json")
-                        .content("{\"amount\": 5, \"currency\": \"USD\"}")
-                        .with(csrf())
-                )
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
 }

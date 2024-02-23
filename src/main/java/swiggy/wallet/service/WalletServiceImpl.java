@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import swiggy.wallet.entity.User;
 import swiggy.wallet.exception.AuthenticationFailed;
 import swiggy.wallet.exception.InsufficientBalanceException;
+import swiggy.wallet.exception.UserNotFoundException;
 import swiggy.wallet.exception.WalletNotFoundException;
 import swiggy.wallet.repository.UserRepository;
 import swiggy.wallet.valueObject.Money;
@@ -27,8 +28,9 @@ public class WalletServiceImpl implements WalletService {
 
 
     @Override
-    public Money deposit(String username, Money depositMoney) throws AuthenticationFailed {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new AuthenticationFailed("Username or password does not match."));
+    public Money deposit(Long userId, Money depositMoney) throws UserNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
         Wallet wallet = user.getWallet();
         Money updatedBalance = wallet.deposit(depositMoney);
         walletRepository.save(wallet);
@@ -37,8 +39,9 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public Money withdraw(String username, Money withdrawalMoney) throws AuthenticationFailed {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new AuthenticationFailed("Username or password does not match."));
+    public Money withdraw(Long userId, Money withdrawalMoney) throws UserNotFoundException, InsufficientBalanceException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
         Wallet wallet = user.getWallet();
         Money updatedBalance = wallet.withdraw(withdrawalMoney);
         walletRepository.save(wallet);

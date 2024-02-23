@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import swiggy.wallet.exception.InsufficientBalanceException;
 import swiggy.wallet.valueObject.Money;
 
 import java.math.BigDecimal;
@@ -38,13 +39,23 @@ public class Wallet {
         return this.money;
     }
 
-    public Money withdraw(Money withdrawalMoney) {
-        if (Objects.isNull(withdrawalMoney) || withdrawalMoney.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Invalid withdrawal amount");
+    public Money withdraw(Money withdrawalMoney) throws InsufficientBalanceException {
+        validateWithdrawalAmount(withdrawalMoney);
+
+        BigDecimal remainingBalance = this.money.subtract(withdrawalMoney).getAmount();
+        if (remainingBalance.doubleValue() < 0.00) {
+            throw new InsufficientBalanceException("Insufficient Balance in Wallet");
         }
 
         this.money = this.money.subtract(withdrawalMoney);
         return this.money;
     }
+
+    private void validateWithdrawalAmount(Money withdrawalMoney) {
+        if (Objects.isNull(withdrawalMoney) || withdrawalMoney.getAmount().doubleValue() < 0.00) {
+            throw new IllegalArgumentException("Invalid withdrawal amount");
+        }
+    }
+
 
 }

@@ -8,11 +8,10 @@ import org.mockito.MockitoAnnotations;
 import swiggy.wallet.entity.User;
 import swiggy.wallet.entity.Wallet;
 import swiggy.wallet.enums.Currency;
-import swiggy.wallet.exception.AuthenticationFailed;
 import swiggy.wallet.exception.InsufficientBalanceException;
+import swiggy.wallet.exception.UserNotFoundException;
 import swiggy.wallet.repository.UserRepository;
 import swiggy.wallet.repository.WalletRepository;
-import swiggy.wallet.service.WalletService;
 import swiggy.wallet.valueObject.Money;
 
 import java.math.BigDecimal;
@@ -41,29 +40,29 @@ class WalletServiceImplTest {
     }
 
     @Test
-    void testDepositSuccessful() throws AuthenticationFailed {
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(mockUser));
+    void testDepositSuccessful() throws  UserNotFoundException {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
 
         Money depositMoney = new Money(BigDecimal.valueOf(50), Currency.USD);
 
         when(walletRepository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
 
-        Money result = walletService.deposit("testUser", depositMoney);
+        Money result = walletService.deposit(1L, depositMoney);
 
         assertEquals(new Money(new BigDecimal("50.00"), Currency.USD), result);
         verify(walletRepository, times(1)).save(any());
     }
 
     @Test
-    void testWithdrawSuccessful() throws AuthenticationFailed, InsufficientBalanceException {
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(mockUser));
-        walletService.deposit( "testUser", new Money(BigDecimal.valueOf(50), Currency.USD));
+    void testWithdrawSuccessful() throws UserNotFoundException, InsufficientBalanceException {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
+        walletService.deposit( 1L, new Money(BigDecimal.valueOf(50), Currency.USD));
         Money withdrawalMoney = new Money(new BigDecimal("50.00"), Currency.USD);
         Money expectedBalance = new Money(new BigDecimal("0.00"), Currency.USD);
 
         when(walletRepository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
 
-        Money result = walletService.withdraw("testUser", withdrawalMoney);
+        Money result = walletService.withdraw(1L, withdrawalMoney);
 
         assertEquals(expectedBalance, result);
         verify(walletRepository, times(2)).save(any());
@@ -75,7 +74,7 @@ class WalletServiceImplTest {
 
         Money depositMoney = new Money(BigDecimal.valueOf(50), Currency.USD);
 
-        assertThrows(AuthenticationFailed.class, () -> walletService.deposit("nonexistentUser", depositMoney));
+        assertThrows(UserNotFoundException.class, () -> walletService.deposit(2L, depositMoney));
         verify(walletRepository, never()).save(any());
     }
 
@@ -85,23 +84,23 @@ class WalletServiceImplTest {
 
         Money withdrawalMoney = new Money(BigDecimal.valueOf(50), Currency.USD);
 
-        assertThrows(AuthenticationFailed.class, () -> walletService.withdraw("nonexistentUser", withdrawalMoney));
+        assertThrows(UserNotFoundException.class, () -> walletService.withdraw(2L, withdrawalMoney));
         verify(walletRepository, never()).save(any());
     }
 
     @Test
-    void testWithdrawWithInsufficientFunds() {
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(mockUser));
+    void testWithdrawWithInsufficientFunds() throws InsufficientBalanceException {
+        Wallet mockWallet = mock(Wallet.class);
 
         Money withdrawalMoney = new Money(BigDecimal.valueOf(150), Currency.USD);
-        Wallet mockWallet = new Wallet(new Money(BigDecimal.valueOf(100), Currency.USD));
+        doThrow(InsufficientBalanceException.class).when(mockWallet).withdraw(withdrawalMoney);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
         mockUser.setWallet(mockWallet);
 
         when(walletRepository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
-
-        assertThrows(IllegalStateException.class, () -> walletService.withdraw("testUser", withdrawalMoney));
+        assertThrows(InsufficientBalanceException.class, () -> walletService.withdraw(1L, withdrawalMoney));
         verify(walletRepository, never()).save(any());
     }
-
 
 }
