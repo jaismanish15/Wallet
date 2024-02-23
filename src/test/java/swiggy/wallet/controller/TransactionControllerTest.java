@@ -48,10 +48,10 @@ public class TransactionControllerTest {
 
     @Test
     void testTransact_SuccessfulTransaction_Returns200() throws Exception {
-        TransactionRequest request = new TransactionRequest("receiver", new Money(new BigDecimal("100.00"), Currency.USD));
+        TransactionRequest request = new TransactionRequest(2L, new Money(new BigDecimal("100.00"), Currency.USD));
         when(transactionService.transact(any(TransactionRequest.class))).thenReturn("Transaction Successful");
 
-        ResultActions resultActions = mockMvc.perform(post("/transactions/transact")
+        ResultActions resultActions = mockMvc.perform(post("/transactions/transact/2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
 
@@ -61,10 +61,10 @@ public class TransactionControllerTest {
 
     @Test
     void testTransact_InsufficientBalance_ReturnsBadRequest() throws Exception {
-        TransactionRequest request = new TransactionRequest("receiver", new Money(new BigDecimal("1000.00"), Currency.USD));
+        TransactionRequest request = new TransactionRequest(2L, new Money(new BigDecimal("1000.00"), Currency.USD));
         when(transactionService.transact(request)).thenThrow(new InsufficientBalanceException("Insufficient Balance"));
 
-        ResultActions resultActions = mockMvc.perform(post("/transactions/transact")
+        ResultActions resultActions = mockMvc.perform(post("/transactions/transact/2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
 

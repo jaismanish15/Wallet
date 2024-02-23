@@ -17,7 +17,7 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
-    @PostMapping("/transact")
+    @PostMapping("/transact/{receiverId}")
     public ResponseEntity<TransactionResponse> transact(@RequestBody TransactionRequest request) {
         try {
             String response = transactionService.transact(request);

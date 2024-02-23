@@ -19,7 +19,7 @@ public class TransactionServiceImpl implements TransactionService{
     public String transact(TransactionRequest requestModel) throws UserNotFoundException, InsufficientBalanceException {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User sender = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User "+ username + " not found."));
-        User receiver = userRepository.findByUsername(requestModel.getReceiverName()).orElseThrow(() -> new UserNotFoundException("User "+ requestModel.getReceiverName() + " not found."));
+        User receiver = userRepository.findById(requestModel.getReceiverId()).orElseThrow(() -> new UserNotFoundException("User with Id: "+ requestModel.getReceiverId() + " not found."));
 
         try{
             sender.getWallet().withdraw(requestModel.getMoney());
