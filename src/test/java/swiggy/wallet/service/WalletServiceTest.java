@@ -35,7 +35,7 @@ class WalletServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         mockUser = new User();
     }
 
