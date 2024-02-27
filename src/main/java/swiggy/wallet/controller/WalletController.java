@@ -25,7 +25,9 @@ public class WalletController {
     @PostMapping("{walletId}/deposit")
     public ResponseEntity<Money> deposit(@PathVariable("walletId") Long walletId, @RequestBody Money depositMoney) {
         try {
-            Money updatedBalance = walletService.deposit(walletId, depositMoney);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            Money updatedBalance = walletService.deposit(walletId, username, depositMoney);
             return ResponseEntity.ok(updatedBalance);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -35,7 +37,9 @@ public class WalletController {
     @PostMapping("{walletId}/withdraw")
     public ResponseEntity<Money> withdraw(@PathVariable("walletId") Long walletId, @RequestBody Money withdrawalMoney) {
         try {
-            Money updatedBalance = walletService.withdraw(walletId, withdrawalMoney);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            Money updatedBalance = walletService.withdraw(walletId, username, withdrawalMoney);
             return ResponseEntity.ok(updatedBalance);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
