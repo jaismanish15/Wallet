@@ -98,21 +98,28 @@ public class UserServiceTest {
         verify(userRepository, never()).delete(any());
     }
 
-//    @Test
-//    public void testAddWalletToUser() {
-//        User user = new User("user1", "pass1", Country.INDIA, new ArrayList<>());
-//        when(userRepository.findByUsername("user1")).thenReturn(Optional.of(user));
-//        when(authentication.getName()).thenReturn("user1");
-//        when(securityContext.getAuthentication()).thenReturn(authentication);
-//        SecurityContextHolder.setContext(securityContext);
-//
-//        userService.addWallet(1);
-//        userService.addWallet(1);
-//
-//        verify(userRepository, times(2)).findByUsername("user1");
-//        verify(userRepository, times(2)).save(user);
-//        assertEquals(2, user.getWallets().size() );
-//        assertEquals(Currency.INR, user.getWallets().get(1).getMoney().getCurrency() );
-//
-//    }
+    @Test
+    public void testCreateUser_ShouldHave1Wallet() {
+        User user = new User("user1", "pass1", Country.INDIA);
+
+        assertEquals(1, user.getWallets().size() );
+        assertEquals(Currency.INR, user.getWallets().get(0).getMoney().getCurrency() );
+    }
+    @Test
+    public void testAddMultipleWalletsToSameUser() {
+        User user = new User("user1", "pass1", Country.INDIA);
+        when(userRepository.findByUsername("user1")).thenReturn(Optional.of(user));
+        when(authentication.getName()).thenReturn("user1");
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        userService.addWallet();
+        userService.addWallet();
+        userService.addWallet();
+
+        verify(userRepository, times(3)).findByUsername("user1");
+        verify(userRepository, times(3)).save(user);
+        assertEquals(4, user.getWallets().size());
+        assertEquals(Currency.INR, user.getWallets().get(1).getMoney().getCurrency() );
+    }
 }

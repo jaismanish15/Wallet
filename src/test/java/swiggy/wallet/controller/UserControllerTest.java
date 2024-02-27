@@ -100,7 +100,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(username = "user")
-    void expectWalletAddedToUser() throws Exception {
+    void testAddWalletAddedToUser() throws Exception {
         User user = new User("user", "pass",Country.INDIA);
         when(userService.addWallet()).thenReturn(user);
 

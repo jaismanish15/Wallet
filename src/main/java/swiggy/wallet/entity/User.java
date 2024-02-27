@@ -7,9 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import swiggy.wallet.enums.Country;
-import swiggy.wallet.valueObject.Money;
-
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,4 +44,7 @@ public class User {
         this.country = country;
         this.wallets.add(new Wallet(country));
     }
+
+
+
 }
