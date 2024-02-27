@@ -8,6 +8,8 @@ import swiggy.wallet.entity.Wallet;
 import swiggy.wallet.enums.Country;
 import swiggy.wallet.valueObject.Money;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,7 +17,7 @@ import swiggy.wallet.valueObject.Money;
 public class UserResponse {
     private Long id;
     private String username;
-    private Wallet wallet;
+    private List<Wallet> wallets;
     private Country country;
     private String message;
     public UserResponse(String message){

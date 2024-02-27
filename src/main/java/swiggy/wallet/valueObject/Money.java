@@ -1,6 +1,8 @@
 package swiggy.wallet.valueObject;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Data;
 import swiggy.wallet.enums.Currency;
 
@@ -14,6 +16,7 @@ import java.util.Objects;
 public class Money {
 
     private BigDecimal amount;
+    @Enumerated(EnumType.STRING)
     private Currency currency;
 
     public Money(BigDecimal amount, Currency currency) {

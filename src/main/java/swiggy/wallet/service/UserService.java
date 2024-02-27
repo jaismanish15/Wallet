@@ -8,5 +8,6 @@ import swiggy.wallet.model.UserResponse;
 public interface UserService {
     UserResponse register(User user) throws UserAlreadyPresentException;
     String delete() throws UserNotFoundException;
+    User addWallet();
 
 }

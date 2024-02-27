@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import swiggy.wallet.entity.User;
-import swiggy.wallet.exception.AuthenticationFailed;
-import swiggy.wallet.exception.InsufficientBalanceException;
-import swiggy.wallet.exception.UserNotFoundException;
-import swiggy.wallet.exception.WalletNotFoundException;
+import swiggy.wallet.exception.*;
 import swiggy.wallet.repository.UserRepository;
 import swiggy.wallet.valueObject.Money;
 import swiggy.wallet.entity.Wallet;
@@ -28,10 +25,12 @@ public class WalletServiceImpl implements WalletService {
 
 
     @Override
-    public Money deposit(Long userId, Money depositMoney) throws UserNotFoundException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
-        Wallet wallet = user.getWallet();
+    public Money deposit(Long walletId, Money depositMoney) throws UserNotFoundException {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        Wallet wallet = walletRepository.findByIdAndUser(walletId, user).orElseThrow(() -> new UnauthorizedWalletException(""));
         Money updatedBalance = wallet.deposit(depositMoney);
         walletRepository.save(wallet);
 
@@ -39,11 +38,13 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public Money withdraw(Long userId, Money withdrawalMoney) throws UserNotFoundException, InsufficientBalanceException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
-        Wallet wallet = user.getWallet();
-        Money updatedBalance = wallet.withdraw(withdrawalMoney);
+    public Money withdraw(Long walletId, Money withdrawalMoney) throws UserNotFoundException, InsufficientBalanceException {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        Wallet wallet = walletRepository.findByIdAndUser(walletId, user).orElseThrow(() -> new UnauthorizedWalletException(""));
+        Money updatedBalance = wallet.deposit(withdrawalMoney);
         walletRepository.save(wallet);
 
         return updatedBalance;

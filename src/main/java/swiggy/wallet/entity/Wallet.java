@@ -22,6 +22,9 @@ public class Wallet {
 
     private Money money;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
     public Wallet(){
         this.money = new Money();
     }

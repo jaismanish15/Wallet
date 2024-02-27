@@ -21,9 +21,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import swiggy.wallet.entity.User;
 import swiggy.wallet.entity.Wallet;
 import swiggy.wallet.enums.Country;
+import swiggy.wallet.enums.Currency;
 import swiggy.wallet.exception.UserAlreadyPresentException;
 import swiggy.wallet.model.UserResponse;
 import swiggy.wallet.service.UserService;
+import swiggy.wallet.valueObject.Money;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -91,6 +96,19 @@ public class UserControllerTest {
                 .andExpect(status().isAccepted())
                 .andExpect(content().string("User Deleted Successfully"));
         verify(userService, times(1)).delete();
+    }
+
+    @Test
+    @WithMockUser(username = "user")
+    void expectWalletAddedToUser() throws Exception {
+        User user = new User("user", "pass",Country.INDIA);
+        when(userService.addWallet()).thenReturn(user);
+
+        mockMvc.perform(put("/api/v1/users/1/wallet")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.wallets.[1]").exists());
+        verify(userService, times(1)).addWallet();
     }
 
 

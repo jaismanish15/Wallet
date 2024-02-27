@@ -11,6 +11,8 @@ import swiggy.wallet.valueObject.Money;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Table(name = "users")
@@ -27,7 +29,6 @@ public class User {
     @Column(unique = true)
     private String username;
 
-
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column
     private String password;
@@ -35,19 +36,15 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Country country;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Wallet> wallets = new ArrayList<>();
+
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "wallet_id")
-    @Builder.Default
-    private Wallet wallet = new Wallet();
-
 
     public User(String username, String password, Country country){
         this.username = username;
         this.password = password;
         this.country = country;
-        this.wallet = new Wallet(country);
+        this.wallets.add(new Wallet(country));
     }
-
 }

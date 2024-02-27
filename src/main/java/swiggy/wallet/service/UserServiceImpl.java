@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import swiggy.wallet.entity.User;
-import swiggy.wallet.enums.Country;
+import swiggy.wallet.entity.Wallet;
 import swiggy.wallet.exception.UserAlreadyPresentException;
 import swiggy.wallet.exception.UserNotFoundException;
 import swiggy.wallet.model.UserResponse;
@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyPresentException("User Already Registered");
         User registeredUser = new User(user.getUsername(), passwordEncoder.encode(user.getPassword()), user.getCountry());
         userRepository.save(registeredUser);
-        return new UserResponse(registeredUser.getId(), registeredUser.getUsername(), registeredUser.getWallet(), registeredUser.getCountry(), "User Registered Successfully");
+        return new UserResponse(registeredUser.getId(), registeredUser.getUsername(), registeredUser.getWallets(), registeredUser.getCountry(), "User Registered Successfully");
     }
 
     @Override
@@ -41,8 +41,17 @@ public class UserServiceImpl implements UserService {
         if(userToDelete.isEmpty())
             throw new UserNotFoundException("User not found");
 
+
         userRepository.delete(userToDelete.get());
-        walletRepository.delete(userToDelete.get().getWallet());
         return "User Deleted Successfully";
+    }
+
+    @Override
+    public User addWallet() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User Not Found"));
+
+        user.getWallets().add(new Wallet(user.getCountry()));
+        return userRepository.save(user);
     }
 }

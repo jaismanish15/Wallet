@@ -10,9 +10,9 @@ import java.util.List;
 
 public interface WalletService {
 
-    Money deposit(Long id, Money depositMoney) throws AuthenticationFailed, UserNotFoundException;
+    Money deposit(Long walletId, Money depositMoney) throws AuthenticationFailed, UserNotFoundException;
 
-    Money withdraw(Long userId, Money withdrawalMoney) throws AuthenticationFailed, InsufficientBalanceException, UserNotFoundException;
+    Money withdraw(Long walletId, Money withdrawalMoney) throws AuthenticationFailed, InsufficientBalanceException, UserNotFoundException;
 
 
 

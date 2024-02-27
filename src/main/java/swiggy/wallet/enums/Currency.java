@@ -1,6 +1,10 @@
 package swiggy.wallet.enums;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
 import java.math.BigDecimal;
+
 
 public enum Currency {
     USD(BigDecimal.ONE),

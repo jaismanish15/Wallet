@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import swiggy.wallet.entity.User;
+import swiggy.wallet.entity.Wallet;
 import swiggy.wallet.exception.InsufficientBalanceException;
 import swiggy.wallet.exception.InvalidAmountException;
 import swiggy.wallet.exception.UserAlreadyPresentException;
@@ -40,6 +41,12 @@ public class UserController {
     public ResponseEntity<String> delete() throws UserNotFoundException {
         String message  = userService.delete();
         return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
+    }
+
+    @PutMapping("/addWallet")
+    public ResponseEntity<User> addWallet() {
+        User user = userService.addWallet();
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
 }

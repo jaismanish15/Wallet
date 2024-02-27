@@ -15,31 +15,27 @@ import swiggy.wallet.service.WalletService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/wallet")
+@RequestMapping("/api/user/wallet")
 public class WalletController {
 
     @Autowired
     private WalletService walletService;
 
 
-    @PostMapping("{userId}/deposit")
-    public ResponseEntity<Money> deposit(@PathVariable Long userId, @RequestBody Money depositMoney) {
+    @PostMapping("{walletId}/deposit")
+    public ResponseEntity<Money> deposit(@PathVariable("walletId") Long walletId, @RequestBody Money depositMoney) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String username = authentication.getName();
-            Money updatedBalance = walletService.deposit(userId, depositMoney);
+            Money updatedBalance = walletService.deposit(walletId, depositMoney);
             return ResponseEntity.ok(updatedBalance);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @PostMapping("{userId}/withdraw")
-    public ResponseEntity<Money> withdraw(@PathVariable Long userId, @RequestBody Money withdrawalMoney) {
+    @PostMapping("{walletId}/withdraw")
+    public ResponseEntity<Money> withdraw(@PathVariable("walletId") Long walletId, @RequestBody Money withdrawalMoney) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String username = authentication.getName();
-            Money updatedBalance = walletService.withdraw(userId, withdrawalMoney);
+            Money updatedBalance = walletService.withdraw(walletId, withdrawalMoney);
             return ResponseEntity.ok(updatedBalance);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

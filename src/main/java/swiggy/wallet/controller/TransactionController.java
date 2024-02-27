@@ -12,12 +12,12 @@ import swiggy.wallet.model.TransactionResponse;
 import swiggy.wallet.service.TransactionService;
 
 @RestController
-@RequestMapping("/transactions")
+@RequestMapping("/api/wallet/transaction")
 public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
-    @PostMapping("/transact/{receiverId}")
+    @PostMapping("/{receiverId}")
     public ResponseEntity<TransactionResponse> transact(@RequestBody TransactionRequest request) {
         try {
             String response = transactionService.transact(request);
