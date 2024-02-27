@@ -15,14 +15,14 @@ import swiggy.wallet.service.WalletService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user/wallet")
+@RequestMapping("/api/user/wallets")
 public class WalletController {
 
     @Autowired
     private WalletService walletService;
 
 
-    @PostMapping("{walletId}/deposit")
+    @PostMapping("/{walletId}/deposit")
     public ResponseEntity<Money> deposit(@PathVariable("walletId") Long walletId, @RequestBody Money depositMoney) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -34,7 +34,7 @@ public class WalletController {
         }
     }
 
-    @PostMapping("{walletId}/withdraw")
+    @PostMapping("/{walletId}/withdraw")
     public ResponseEntity<Money> withdraw(@PathVariable("walletId") Long walletId, @RequestBody Money withdrawalMoney) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

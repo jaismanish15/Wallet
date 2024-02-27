@@ -105,12 +105,10 @@ public class UserControllerTest {
 
         when(userService.addWallet()).thenReturn(user);
 
-        mockMvc.perform(put("/api/users/addWallet")
+        mockMvc.perform(post("/api/users/1/wallet")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         verify(userService, times(1)).addWallet();
     }
-
-
 }

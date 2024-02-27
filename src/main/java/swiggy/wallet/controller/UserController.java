@@ -43,7 +43,7 @@ public class UserController {
         return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
     }
 
-    @PutMapping("/addWallet")
+    @PostMapping("/{userId}/wallet")
     public ResponseEntity<User> addWallet() {
         User user = userService.addWallet();
         return new ResponseEntity<>(user, HttpStatus.OK);

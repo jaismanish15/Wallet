@@ -9,6 +9,8 @@ import swiggy.wallet.valueObject.Money;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransactionRequest {
+    private Long senderWalletId;
+    private Long receiverWalletId;
     private Long receiverId;
     private Money money;
 }

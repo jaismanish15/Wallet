@@ -16,15 +16,18 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import swiggy.wallet.enums.Currency;
 import swiggy.wallet.exception.InsufficientBalanceException;
 import swiggy.wallet.model.TransactionRequest;
+import swiggy.wallet.model.TransactionResponse;
 import swiggy.wallet.service.TransactionService;
 import swiggy.wallet.valueObject.Money;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static swiggy.wallet.Constant.SERVICE_FEE;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -48,23 +51,25 @@ public class TransactionControllerTest {
 
     @Test
     void testTransact_SuccessfulTransaction_Returns200() throws Exception {
-        TransactionRequest request = new TransactionRequest(2L, new Money(new BigDecimal("100.00"), Currency.USD));
-        when(transactionService.transact(any(TransactionRequest.class))).thenReturn("Transaction Successful");
+        TransactionRequest request = new TransactionRequest(2L,2L,2L, new Money(new BigDecimal("100.00"), Currency.USD));
+        TransactionResponse response = new TransactionResponse("Transaction Successful", LocalDateTime.now(), 2L, 2L, new Money(new BigDecimal("100.00"), Currency.USD), SERVICE_FEE);
+        when(transactionService.transact(any(TransactionRequest.class))).thenReturn(response);
 
-        ResultActions resultActions = mockMvc.perform(post("/api/wallet/transaction/2")
+        ResultActions resultActions = mockMvc.perform(post("/api/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
 
-        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Transaction Successful"));
         verify(transactionService, times(1)).transact(any(TransactionRequest.class));
     }
 
     @Test
     void testTransact_InsufficientBalance_ReturnsBadRequest() throws Exception {
-        TransactionRequest request = new TransactionRequest(2L, new Money(new BigDecimal("1000.00"), Currency.USD));
+        TransactionRequest request = new TransactionRequest(2L,2L,2L, new Money(new BigDecimal("1000.00"), Currency.USD));
         when(transactionService.transact(request)).thenThrow(new InsufficientBalanceException("Insufficient Balance"));
 
-        ResultActions resultActions = mockMvc.perform(post("/api/wallet/transaction/2")
+        ResultActions resultActions = mockMvc.perform(post("/api/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
 

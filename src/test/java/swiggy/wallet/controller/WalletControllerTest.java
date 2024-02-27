@@ -43,7 +43,7 @@ class WalletControllerTest {
 
     @Test
     public void testDepositUnauthorized() throws Exception {
-        mockMvc.perform(post("/api/user/wallet/1/deposit")
+        mockMvc.perform(post("/api/user/wallets/1/deposit")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"amount\": 5, \"currency\": \"USD\"}")
                         .with(csrf()))
@@ -52,7 +52,7 @@ class WalletControllerTest {
 
     @Test
     public void testWithdrawUnauthorized() throws Exception {
-        mockMvc.perform(post("/api/user/wallet/1/withdraw")
+        mockMvc.perform(post("/api/user/wallets/1/withdraw")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"amount\": 5, \"currency\": \"USD\"}")
                         .with(csrf()))
@@ -62,7 +62,7 @@ class WalletControllerTest {
     @Test
     @WithMockUser(username = "mj")
     public void testDepositAuthorized() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/wallet/1/deposit")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/wallets/1/deposit")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"amount\": 10, \"currency\": \"USD\"}")
                         .with(csrf()))
@@ -77,7 +77,7 @@ class WalletControllerTest {
 
         when(walletService.deposit(1L, "mj", depositMoney)).thenReturn(updatedBalance);
 
-        mockMvc.perform(post("/api/user/wallet/1/deposit")
+        mockMvc.perform(post("/api/user/wallets/1/deposit")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(depositMoney))
                         .with(csrf()))
@@ -96,7 +96,7 @@ class WalletControllerTest {
         Money updatedBalance = new Money(new BigDecimal("30.00"), Currency.USD);
         when(walletService.withdraw(1L, "mj", withdrawalMoney)).thenReturn(updatedBalance);
 
-        mockMvc.perform(post("/api/user/wallet/1/withdraw")
+        mockMvc.perform(post("/api/user/wallets/1/withdraw")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(withdrawalMoney))
                         .with(csrf()))
@@ -110,7 +110,7 @@ class WalletControllerTest {
     @Test
     @WithMockUser(username = "mj")
     public void testWithdrawAuthorized() throws Exception {
-        mockMvc.perform(post("/api/user/wallet/1/withdraw")
+        mockMvc.perform(post("/api/user/wallets/1/withdraw")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"amount\": 5, \"currency\": \"USD\"}")
                         .with(csrf()))
