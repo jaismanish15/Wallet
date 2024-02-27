@@ -2,6 +2,7 @@ package swiggy.wallet.valueObject;
 
 import org.junit.jupiter.api.Test;
 import swiggy.wallet.enums.Currency;
+import swiggy.wallet.exception.InsufficientBalanceException;
 import swiggy.wallet.valueObject.Money;
 
 import java.math.BigDecimal;
@@ -40,7 +41,7 @@ class MoneyTest {
     }
 
     @Test
-    public void testWithdraw() {
+    public void testWithdraw() throws InsufficientBalanceException {
         Money initialMoney = new Money(new BigDecimal("100.00"), Currency.USD);
         Money withdrawalMoney = new Money(new BigDecimal("50.00"), Currency.USD);
 
@@ -59,7 +60,7 @@ class MoneyTest {
     }
 
     @Test
-    public void testWithdrawDifferentCurrency() {
+    public void testWithdrawDifferentCurrency() throws InsufficientBalanceException {
         Money initialMoney = new Money(new BigDecimal("100.00"), Currency.USD);
         Money withdrawalMoney = new Money(new BigDecimal("10.00"), Currency.EUR);
 
@@ -74,7 +75,7 @@ class MoneyTest {
         Money initialMoney = new Money(new BigDecimal("50.00"), Currency.USD);
         Money withdrawalMoney = new Money(new BigDecimal("100.00"), Currency.USD);
 
-        assertThrows(IllegalStateException.class, () -> initialMoney.subtract(withdrawalMoney));
+        assertThrows(InsufficientBalanceException.class, () -> initialMoney.subtract(withdrawalMoney));
     }
 
     @Test
@@ -89,7 +90,7 @@ class MoneyTest {
     }
 
     @Test
-    public void testWithdrawDifferentCurrency_INR() {
+    public void testWithdrawDifferentCurrency_INR() throws InsufficientBalanceException {
         Money initialMoney = new Money(new BigDecimal("200.00"), Currency.USD);
         Money withdrawalMoney = new Money(new BigDecimal("83.00"), Currency.INR);
 

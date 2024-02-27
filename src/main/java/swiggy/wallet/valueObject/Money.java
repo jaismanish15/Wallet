@@ -5,6 +5,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Data;
 import swiggy.wallet.enums.Currency;
+import swiggy.wallet.exception.InsufficientBalanceException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -41,14 +42,14 @@ public class Money {
         return new Money(amount.add(convertedDeposit.getAmount()), currency);
     }
 
-    public Money subtract(Money withdrawalMoney) {
+    public Money subtract(Money withdrawalMoney) throws InsufficientBalanceException {
         if (withdrawalMoney.getAmount().compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Withdrawal amount must be non-negative");
         }
 
         Money convertedWithdrawal = convertCurrency(withdrawalMoney);
         if (amount.compareTo(convertedWithdrawal.getAmount()) < 0) {
-            throw new IllegalStateException("Insufficient funds for withdrawal");
+            throw new InsufficientBalanceException("Insufficient funds for withdrawal");
         }
 
         return new Money(amount.subtract(convertedWithdrawal.getAmount()), currency);

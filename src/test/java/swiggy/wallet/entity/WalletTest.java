@@ -79,6 +79,6 @@ public class WalletTest {
         Wallet wallet = new Wallet();
         Money withdrawalMoney = new Money(new BigDecimal("25.00"), Currency.USD);
 
-        assertThrows(IllegalStateException.class, () -> wallet.withdraw(withdrawalMoney));
+        assertThrows(InsufficientBalanceException.class, () -> wallet.withdraw(withdrawalMoney));
     }
 }

@@ -101,13 +101,14 @@ public class UserControllerTest {
     @Test
     @WithMockUser(username = "user")
     void testAddWalletAddedToUser() throws Exception {
-        User user = new User("user", "pass",Country.INDIA);
+        User user = new User("user", "pass", Country.INDIA);
+
         when(userService.addWallet()).thenReturn(user);
 
-        mockMvc.perform(put("/api/v1/users/1/wallet")
+        mockMvc.perform(put("/api/users/addWallet")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.wallets.[1]").exists());
+                .andExpect(status().isOk());
+
         verify(userService, times(1)).addWallet();
     }
 

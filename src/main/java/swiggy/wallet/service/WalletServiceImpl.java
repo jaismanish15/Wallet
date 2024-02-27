@@ -22,15 +22,13 @@ public class WalletServiceImpl implements WalletService {
 
 
 
-
-
     @Override
-    public Money deposit(Long walletId, Money depositMoney) throws UserNotFoundException {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public Money deposit(Long walletId, String username, Money depositMoney) throws UserNotFoundException, AuthenticationFailed {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new AuthenticationFailed("Username or password does not match."));
         if (user == null) {
             throw new UserNotFoundException("User not found");
         }
-        Wallet wallet = walletRepository.findByIdAndUser(walletId, user).orElseThrow(() -> new UnauthorizedWalletException(""));
+        Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new WalletNotFoundException("Wallet Not Found"));
         Money updatedBalance = wallet.deposit(depositMoney);
         walletRepository.save(wallet);
 
@@ -38,13 +36,13 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public Money withdraw(Long walletId, Money withdrawalMoney) throws UserNotFoundException, InsufficientBalanceException {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public Money withdraw(Long walletId, String username, Money withdrawalMoney) throws UserNotFoundException, InsufficientBalanceException, AuthenticationFailed {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new AuthenticationFailed("Username or password does not match."));
         if (user == null) {
             throw new UserNotFoundException("User not found");
         }
-        Wallet wallet = walletRepository.findByIdAndUser(walletId, user).orElseThrow(() -> new UnauthorizedWalletException(""));
-        Money updatedBalance = wallet.deposit(withdrawalMoney);
+        Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new WalletNotFoundException("Wallet Not Found"));
+        Money updatedBalance = wallet.withdraw(withdrawalMoney);
         walletRepository.save(wallet);
 
         return updatedBalance;
