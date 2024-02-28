@@ -73,14 +73,16 @@ public class TransactionServiceImpl implements TransactionService{
     private static Money getServiceFee(TransactionRequest requestModel, Wallet receiverWallet, Wallet senderWallet) throws InvalidAmountException {
         Money serviceFee = new Money(new BigDecimal("0.0"), SERVICE_FEE.getCurrency());
         if(!requestModel.getMoney().getCurrency().equals(receiverWallet.getMoney().getCurrency()) ||
-                !requestModel.getMoney().getCurrency().equals(senderWallet.getMoney().getCurrency()) ||
-                !senderWallet.getMoney().getCurrency().equals(receiverWallet.getMoney().getCurrency())
+                !requestModel.getMoney().getCurrency().equals(senderWallet.getMoney().getCurrency())
         ){
             serviceFee.setAmount(SERVICE_FEE.getAmount());
             serviceFee.setCurrency(SERVICE_FEE.getCurrency());
         }
         if (serviceFee.compareTo(requestModel.getMoney()) > 0) {
             throw new InvalidAmountException("");
+        }
+        if(!senderWallet.getMoney().getCurrency().equals(receiverWallet.getMoney().getCurrency())){
+            throw new InvalidAmountException("Please Provide Valid Money to Transfer");
         }
 
         return serviceFee;

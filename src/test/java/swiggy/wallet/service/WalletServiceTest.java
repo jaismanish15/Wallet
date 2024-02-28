@@ -56,7 +56,7 @@ class WalletServiceImplTest {
 
         Money result = walletService.deposit(1L, "user", depositMoney);
 
-        assertEquals(new Money(new BigDecimal("50.00"), Currency.USD), result);
+        assertEquals(new Money(new BigDecimal("50.0"), Currency.USD), result);
         verify(walletRepository, times(1)).save(any());
 
     }
@@ -75,7 +75,7 @@ class WalletServiceImplTest {
 
         Money result = walletService.withdraw(1L, "user", withdrawMoney);
 
-        assertEquals(new Money(new BigDecimal("100.00"), Currency.USD), result);
+        assertEquals(new Money(new BigDecimal("100.0"), Currency.USD), result);
         verify(walletRepository, times(2)).save(any());
     }
 

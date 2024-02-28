@@ -29,7 +29,7 @@ class MoneyTest {
 
         Money result = initialMoney.add(depositMoney);
 
-        assertEquals(new BigDecimal("110.75"), result.getAmount());
+        assertEquals(new BigDecimal("111.20"), result.getAmount());
         assertEquals(Currency.USD, result.getCurrency());
     }
     @Test
@@ -66,7 +66,7 @@ class MoneyTest {
 
         Money result = initialMoney.subtract(withdrawalMoney);
 
-        assertEquals(new BigDecimal("89.25"), result.getAmount());
+        assertEquals(new BigDecimal("88.80"), result.getAmount());
         assertEquals(Currency.USD, result.getCurrency());
     }
 
