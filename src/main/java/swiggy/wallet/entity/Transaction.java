@@ -24,12 +24,12 @@ public class Transaction {
     @ManyToOne(cascade = CascadeType.ALL)
     private User sender;
 
-    private int senderWalletId;
+    private Long senderWalletId;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private User receiver;
 
-    private int receiverWalletId;
+    private Long receiverWalletId;
 
     @Embedded
     @AttributeOverrides({
@@ -38,13 +38,13 @@ public class Transaction {
     })
     private Money serviceCharge;
 
-    public Transaction(LocalDateTime timestamp, Money money, User sender, int senderWalletId, User receiver, int receiverWalletId, Money serviceCharge) {
-        this.timestamp = timestamp;
+    public Transaction(Money money, Money serviceCharge, User sender, Long senderWalletId, User receiver, Long receiverWalletId,LocalDateTime timestamp) {
         this.money = money;
-        this.sender = sender;
-        this.senderWalletId = senderWalletId;
-        this.receiver = receiver;
-        this.receiverWalletId = receiverWalletId;
         this.serviceCharge = serviceCharge;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.senderWalletId = senderWalletId;
+        this.receiverWalletId = receiverWalletId;
+        this.timestamp = timestamp;
     }
 }

@@ -9,12 +9,13 @@ import swiggy.wallet.exception.InsufficientBalanceException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.Objects;
 
 
 @Data
 @Embeddable
-public class Money {
+public class Money implements Comparable<Money> {
 
     private BigDecimal amount;
     @Enumerated(EnumType.STRING)
@@ -39,7 +40,7 @@ public class Money {
         }
 
         Money convertedDeposit = convertCurrency(depositMoney);
-        return new Money(amount.add(convertedDeposit.getAmount()), currency);
+        return new Money(amount.add(convertedDeposit.getAmount()), this.currency);
     }
 
     public Money subtract(Money withdrawalMoney) throws InsufficientBalanceException {
@@ -52,13 +53,11 @@ public class Money {
             throw new InsufficientBalanceException("Insufficient funds for withdrawal");
         }
 
-        return new Money(amount.subtract(convertedWithdrawal.getAmount()), currency);
+        return new Money(amount.subtract(convertedWithdrawal.getAmount()), this.currency);
     }
 
     private Money convertCurrency(Money money) {
-        BigDecimal exchangeRate = money.getCurrency().getExchangeRate();
-        BigDecimal convertedAmount = money.getAmount().divide(exchangeRate, 2, RoundingMode.HALF_UP);
-        return new Money(convertedAmount, this.currency);
+        return new Money(money.getCurrency().convertAmount(money.getAmount(), this.currency), this.currency);
     }
 
     @Override
@@ -73,5 +72,11 @@ public class Money {
     @Override
     public int hashCode() {
         return Objects.hash(amount, currency);
+    }
+
+    @Override
+    public int compareTo(Money otherMoney) {
+        Money convertedOtherMoney = convertCurrency(otherMoney);
+        return this.amount.compareTo(convertedOtherMoney.getAmount());
     }
 }
