@@ -26,7 +26,7 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @PostMapping("/register")
+    @PostMapping("")
     public ResponseEntity<UserResponse> register(@RequestBody User user) {
         try {
             UserResponse userResponse = userService.register(user);

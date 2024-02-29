@@ -11,6 +11,9 @@ import swiggy.wallet.model.TransactionRequest;
 import swiggy.wallet.model.TransactionResponse;
 import swiggy.wallet.service.TransactionService;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
@@ -30,4 +33,11 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new TransactionResponse("Service Fee is Greater than Transaction Amount"));
         }
     }
+
+//    @GetMapping
+//    public ResponseEntity<List<TransactionResponse>> fetch(@RequestParam(required = false) LocalDate startDate, @RequestParam(required = false) LocalDate endDate){
+//        if(startDate != null && endDate != null)
+//            return new ResponseEntity<>(transactionService.fetchByDate(startDate,endDate), HttpStatus.OK);
+//        return new ResponseEntity<>(transactionService.fetch(), HttpStatus.OK);
+//    }
 }
